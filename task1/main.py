@@ -1,10 +1,16 @@
 import requests
-import httpx
+from bs4 import BeautifulSoup
 
 
 def main():
-    s = httpx.get("https://bab.la/")
-    print(s.text)
+    word = "jab%C5%82ko"
+    url = "https://www.diki.pl/slownik-angielskiego?q=" + word
+
+    page = requests.get(url)
+    soup = BeautifulSoup(page.text, "html.parser")
+    elements = soup.find_all("meta")
+    translated_word = str(elements[1])
+    print(translated_word.split(" ")[-2])
 
 
 if __name__ == "__main__":
