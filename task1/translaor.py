@@ -22,12 +22,22 @@ def encoding(word: str):
         return ""
 
 
-def translate(word: str = "") -> str:
-    # word = input("słowo do przetłumaczenie:")
-    # word = "zamek"
-    encoded_word = encoding(word)
+def send_request(encoded_word: str):
+    """Send request to website with word to translate.
+
+    Args:
+        encoded_word (str): give encoded word undestandable by HTML
+
+    Returns:
+        request : page with HTML
+    """
     url = "https://www.diki.pl/slownik-angielskiego?q=" + encoded_word
-    page = requests.get(url)
+    return requests.get(url)
+
+
+def translate(word: str = "") -> str:
+    encoded_word = encoding(word)
+    page = send_request(encoded_word)
     soup = BeautifulSoup(page.text, "html.parser")
     elements = str(soup.find_all("meta")[1]).split()
     elements = [x.strip(" '") for x in elements]
