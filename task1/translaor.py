@@ -35,14 +35,26 @@ def send_request(encoded_word: str):
     return requests.get(url)
 
 
-def translate(word: str = "") -> str:
-    encoded_word = encoding(word)
-    page = send_request(encoded_word)
+def give_only_tranlated_words(page):
+    """Extract translated world.
+
+    Args:
+        page: HTML from request
+
+    Returns:
+        translated_words (list): return translated word.
+    """
     soup = BeautifulSoup(page.text, "html.parser")
     elements = str(soup.find_all("meta")[1]).split()
     elements = [x.strip(" '") for x in elements]
+    return elements[17:-1]
 
-    translated = elements[17:-1]
+
+def translate(word: str = "") -> str:
+    encoded_word = encoding(word)
+    page = send_request(encoded_word)
+    translated = give_only_tranlated_words(page)
+
     result = ""
     for i in translated:
         result += i + " "
