@@ -24,7 +24,6 @@ def encoding(words: list):
             result += quote(word, safe="")
             if words.index(word) < len(words) and words.index(word) > 0:
                 result += "+"
-        print(result)
         return result
     except:
         return ""
@@ -50,12 +49,42 @@ def give_only_tranlated_words(page):
         page: HTML from request
 
     Returns:
-        translated_words (list): return translated word.
+        translated_words (set): return translated word.
     """
     soup = BeautifulSoup(page.text, "html.parser")
-    elements = str(soup.find_all("meta")[1]).split()
-    elements = [x.strip(" '") for x in elements]
-    return elements[17:-1]
+    scrap_meta = str(soup.find_all("meta")[1]).split()
+    striped_meta = [x.strip(" ,'") for x in scrap_meta]
+    words = check_direction_translate(striped_meta)
+
+    return words
+
+
+def check_direction_translate(striped_meta: list):
+    """Check direction to translate the word is supposed to be PL>EN or EN>PL
+
+    Args:
+        striped_meta (list): <meta> from HTML with translated words and some
+        mess
+
+    Returns:
+        _type_: _description_
+    """
+    words_list = []
+    if "polsku?" in striped_meta:
+        # English to Polish
+        words_list.append("EN>PL")
+        for i in striped_meta[21:-1]:
+            if i not in words_list:  # I want unique words
+                words_list.append(i)
+    elif "angielsku?" in striped_meta:
+        # Polish to English
+        words_list.append("PL>EN")
+        for i in striped_meta[17:-1]:
+            if i not in words_list:  # I want unique words
+                words_list.append(i)
+    else:
+        return "We don't have this word in our dictionary"
+    return words_list
 
 
 def compare_all_translated_word_to_str(translated_words: list):
@@ -73,8 +102,8 @@ def compare_all_translated_word_to_str(translated_words: list):
     return result_as_string
 
 
-def translate(word: list) -> str:
-    encoded_word = encoding(word)
+def translate(input_words: list) -> str:
+    encoded_word = encoding(input_words)
     page = send_request(encoded_word)
     translated_words = give_only_tranlated_words(page)
     result = compare_all_translated_word_to_str(translated_words)
@@ -88,7 +117,6 @@ def main(argument: Optional[Sequence[str]] = None):
         "word", type=str, nargs="+", help="Enter a word to translate"
     )
     args = parser.parse_args()
-    print(args.word)
     translate(args.word)
     return 0
 
