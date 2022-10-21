@@ -1,11 +1,9 @@
 #!/usr/bin/python3
 import argparse
-from operator import index
 import requests
 from requests.utils import quote
 from bs4 import BeautifulSoup
-from typing import Optional
-from typing import Sequence
+from typing import Optional, Sequence
 
 
 def encoding(words: list):
@@ -53,7 +51,7 @@ def give_only_tranlated_words(page):
     """
     soup = BeautifulSoup(page.text, "html.parser")
     scrap_meta = str(soup.find_all("meta")[1]).split()
-    striped_meta = [x.strip(" ,'") for x in scrap_meta]
+    striped_meta = [x.strip(" ;,'") for x in scrap_meta]
     words = check_direction_translate(striped_meta)
 
     return words
@@ -67,23 +65,21 @@ def check_direction_translate(striped_meta: list):
         mess
 
     Returns:
-        _type_: _description_
+        words_list (list): words in list
     """
     words_list = []
     if "polsku?" in striped_meta:
         # English to Polish
         words_list.append("EN>PL")
-        for i in striped_meta[21:-1]:
-            if i not in words_list:  # I want unique words
-                words_list.append(i)
     elif "angielsku?" in striped_meta:
         # Polish to English
         words_list.append("PL>EN")
-        for i in striped_meta[17:-1]:
-            if i not in words_list:  # I want unique words
-                words_list.append(i)
     else:
         return "We don't have this word in our dictionary"
+
+    for i in striped_meta[16:-1]:
+        if i not in words_list:  # I want unique words
+            words_list.append(i)
     return words_list
 
 
@@ -97,8 +93,9 @@ def compare_all_translated_word_to_str(translated_words: list):
         str: string with translated word
     """
     result_as_string = ""
-    for i in translated_words:
-        result_as_string += i + " "
+    for word in translated_words:
+        result_as_string += word + " "
+        
     return result_as_string
 
 
