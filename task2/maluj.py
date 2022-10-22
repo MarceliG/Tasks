@@ -2,6 +2,8 @@ from PIL import Image, ImageDraw
 
 
 class Read:
+    """Read some file."""
+
     def __init__(self):
         """canvas [W] [H]
         triangle [color] [point A], [point B], [point C]
@@ -16,9 +18,22 @@ class Read:
         }
 
     def _give_pure_line(self, line: str):
+        """Returns list withaut ' (),' from string.
+
+        Args:
+            line (str): Input string to clean from whitesigns
+
+        Returns:
+            (list): list with pure text.
+        """
         return [x.strip(" (),") for x in line.split()[1:]]
 
-    def read_file(self, file_name):
+    def read_file(self, file_name: str):
+        """Read file, find line with 'canvas', 'triangle', 'rectangle'.
+
+        Args:
+            file_name (str): filename
+        """
         with open(file_name) as f:
             for line in f.readlines():
                 if "canvas" in line:
@@ -36,27 +51,50 @@ class Read:
 
 
 class Draw:
-    def __init__(self, width, height):
+    """Draw some figures."""
+
+    def __init__(self, width: int, height: int):
+        """Create canvas
+
+        Args:
+            width (int): width canvas
+            height (int): height canvas
+        """
         self.im = Image.new("RGB", (width, height))
         self.draw = ImageDraw.Draw(self.im)
-
-    def create_canvas(self):
-        pass
 
     def create_triangle(
         self,
         point_A: tuple,
         point_B: tuple,
         point_C: tuple,
-        color: str,
+        color: str = "red",
     ):
+        """Create triangle with 3 point and color.
+
+        Args:
+            point_A (tuple(int)): Cartesian point(x,y)
+            point_B (tuple(int)): Cartesian point(x,y)
+            point_C (tuple(int)): Cartesian point(x,y)
+            color (str): fille color
+        """
         self.draw.polygon(xy=[point_A, point_B, point_C], fill=color)
 
-    def create_rectangle(self, start_point: tuple, size: tuple, color: str):
+    def create_rectangle(
+        self, start_point: tuple, size: tuple, color: str = "red"
+    ):
+        """Create rectangle with 1 point, size and color.
+
+        Args:
+            start_point (tuple(int)): Cartesian point(x,y)
+            size (tuple(int)): width x height
+            color (str): color
+        """
         self.draw.rectangle(xy=[start_point, size], fill=color)
 
 
 def main():
+    """Core Script."""
     file = Read()
     file.read_file("plik.txt")
 
@@ -95,8 +133,11 @@ def main():
     )
     rectangle_color = file.properties_to_draw["rectangle"][0]
 
-    im.create_rectangle(rectangle_start_point, rectangle_size, rectangle_color)
-    im.im.save("pillow_imagedraw.png")
+    im.create_rectangle(
+        rectangle_start_point, rectangle_size, rectangle_color
+    )  # draw rectangle
+
+    im.im.save("pillow_imagedraw.png")  # save file to png
 
 
 if __name__ == "__main__":
