@@ -51,6 +51,34 @@ class Read:
                     ] = self._give_pure_line(line)
 
 
+class Canvas:
+    """Create canvas."""
+
+    def __init__(self, width: int, height: int):
+        """Prepare canvas with proper size.
+
+        Args:
+            width (int): width canvas
+            height (int): height canvas
+        """
+        self.image = Image.new("RGB", (width, height))
+        self.draw = ImageDraw.Draw(self.image)
+
+
+class Triangle(Canvas):
+    def __init__(self, width: int, height: int):
+        super().__init__(width, height)
+        self.color: str = "red"
+        self.point_a
+        self.point_b
+        self.point_c
+
+
+class Rectangle(Canvas):
+    def __init__(self, width: int, height: int):
+        super().__init__(width, height)
+
+
 class Draw:
     """Draw some figures."""
 
