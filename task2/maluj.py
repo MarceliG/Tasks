@@ -4,7 +4,7 @@ from PIL import Image, ImageDraw
 class Read:
     """Read some file."""
 
-    def __init__(self):
+    def __init__(self, file: str):
         """canvas [W] [H]
         triangle [color] [point A], [point B], [point C]
         point -> (x, y)
@@ -16,6 +16,7 @@ class Read:
             "triangle": [],
             "rectangle": [],
         }
+        self.read_file(file)
 
     def _give_pure_line(self, line: str):
         """Returns list withaut ' (),' from string.
@@ -95,8 +96,8 @@ class Draw:
 
 def main():
     """Core Script."""
-    file = Read()
-    file.read_file("plik.txt")
+    file = Read("plik.txt")
+    # file.read_file("plik.txt")
 
     width = int(file.properties_to_draw["canvas"][0])
     height = int(file.properties_to_draw["canvas"][1])
