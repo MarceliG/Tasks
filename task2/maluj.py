@@ -1,5 +1,9 @@
+#!/usr/bin/python3
+
+import textwrap
 from PIL import Image, ImageDraw
 from abc import ABC, abstractmethod
+import argparse
 
 
 class Read:
@@ -12,12 +16,16 @@ class Read:
         rectangle [color] [point] [size]
         size -> (w, h)
         """
+        self.filename = file
         self.properties_to_draw = {
             "canvas": [],
             "triangle": [],
             "rectangle": [],
         }
         self.read_file(file)
+
+    def __str__(self):
+        return str(self.filename)
 
     def _give_pure_line(self, line: str):
         """Returns list withaut ' (),' from string.
@@ -136,66 +144,124 @@ class Rectangle(Draw):
         )
 
 
+def draw_all_form_file(file):
+
+    try:
+        width_canvas = int(file.properties_to_draw["canvas"][0])
+        height_canvas = int(file.properties_to_draw["canvas"][1])
+    except:
+        pass
+
+    try:
+        # Triangle
+        triangle_point_A = (
+            int(file.properties_to_draw["triangle"][1]),
+            int(file.properties_to_draw["triangle"][2]),
+        )
+        triangle_point_B = (
+            int(file.properties_to_draw["triangle"][3]),
+            int(file.properties_to_draw["triangle"][4]),
+        )
+
+        triangle_point_C = (
+            int(file.properties_to_draw["triangle"][5]),
+            int(file.properties_to_draw["triangle"][6]),
+        )
+        triangle_color = file.properties_to_draw["triangle"][0]
+    except:
+        pass
+
+    try:
+        # Rectangle
+        rectangle_start_point = (
+            int(file.properties_to_draw["rectangle"][1]),
+            int(file.properties_to_draw["rectangle"][2]),
+        )
+        rectangle_size = (
+            int(file.properties_to_draw["rectangle"][1])
+            + int(file.properties_to_draw["rectangle"][3]),
+            int(file.properties_to_draw["rectangle"][2])
+            + int(file.properties_to_draw["rectangle"][4]),
+        )
+        rectangle_color = file.properties_to_draw["rectangle"][0]
+    except:
+        pass
+
+    try:
+        # Create object
+        canvas = Canvas(width=width_canvas, height=height_canvas)
+    except:
+        pass
+
+    try:
+        # Create object
+        triangle = Triangle(
+            canvas=canvas,
+            color=triangle_color,
+            point_a=triangle_point_A,
+            point_b=triangle_point_B,
+            point_c=triangle_point_C,
+        )
+        # Drawing objects
+        triangle.draw()
+    except:
+        pass
+
+    try:
+        # Create object
+        rectangle = Rectangle(
+            canvas=canvas,
+            color=rectangle_color,
+            start_point=rectangle_start_point,
+            size=rectangle_size,
+        )
+        # Drawing objects
+        rectangle.draw()
+    except:
+        pass
+
+    try:
+        # Save image
+        canvas.image.save(str(file).split(".")[0] + ".png")
+    except:
+        pass
+
+
 def main():
     """Core Script."""
-    file = Read("plik.txt")
 
-    width_canvas = int(file.properties_to_draw["canvas"][0])
-    height_canvas = int(file.properties_to_draw["canvas"][1])
-
-    # Triangle
-    triangle_point_A = (
-        int(file.properties_to_draw["triangle"][1]),
-        int(file.properties_to_draw["triangle"][2]),
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=textwrap.dedent(
+            """Draw triangle or rectangle.
+            
+        First of all prepare file.txt with sample text:
+        --- file.txt ---
+        canvas size
+        triangle color (point_A), (point_B), (point_C)
+        rectangle color (point_A), (size)
+        ----------------
+        Explanation:
+        color : str = color_name
+        point : tuple = (x, y)
+        size : tuple = (width, height)
+        """
+        ),
     )
-    triangle_point_B = (
-        int(file.properties_to_draw["triangle"][3]),
-        int(file.properties_to_draw["triangle"][4]),
+    parser.add_argument(
+        "-f",
+        "--file",
+        type=str,
+        help="Enter the file.txt for drawing",
     )
-
-    triangle_point_C = (
-        int(file.properties_to_draw["triangle"][5]),
-        int(file.properties_to_draw["triangle"][6]),
-    )
-    triangle_color = file.properties_to_draw["triangle"][0]
-
-    # Rectangle
-    rectangle_start_point = (
-        int(file.properties_to_draw["rectangle"][1]),
-        int(file.properties_to_draw["rectangle"][2]),
-    )
-    rectangle_size = (
-        int(file.properties_to_draw["rectangle"][1])
-        + int(file.properties_to_draw["rectangle"][3]),
-        int(file.properties_to_draw["rectangle"][2])
-        + int(file.properties_to_draw["rectangle"][4]),
-    )
-    rectangle_color = file.properties_to_draw["rectangle"][0]
-
-    # Create objects
-    canvas = Canvas(width=width_canvas, height=height_canvas)
-
-    triangle = Triangle(
-        canvas=canvas,
-        color=triangle_color,
-        point_a=triangle_point_A,
-        point_b=triangle_point_B,
-        point_c=triangle_point_C,
-    )
-
-    rectangle = Rectangle(
-        canvas=canvas,
-        color=rectangle_color,
-        start_point=rectangle_start_point,
-        size=rectangle_size,
-    )
-
-    # Drawing objects
-    triangle.draw()
-    rectangle.draw()
-
-    # Save image
-    canvas.image.save("image.png")
+    args = parser.parse_args()
+    if args.file:
+        if "txt" in args.file.split("."):
+            read_file = Read(args.file)
+            draw_all_form_file(read_file)
+        else:
+            print("Your file does not have a '.txt' extension.")
+    return 0
 
 
 if __name__ == "__main__":
