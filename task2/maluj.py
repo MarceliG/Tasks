@@ -1,4 +1,5 @@
 from PIL import Image, ImageDraw
+from abc import ABC, abstractmethod
 
 
 class Read:
@@ -65,73 +66,84 @@ class Canvas:
         self.draw = ImageDraw.Draw(self.image)
 
 
-class Triangle(Canvas):
-    def __init__(self, width: int, height: int):
-        super().__init__(width, height)
-        self.color: str = "red"
-        self.point_a
-        self.point_b
-        self.point_c
+class Draw(ABC):
+    """Abstract class"""
+
+    @abstractmethod
+    def draw(self):
+        """Figure must be able to draw."""
+        pass
 
 
-class Rectangle(Canvas):
-    def __init__(self, width: int, height: int):
-        super().__init__(width, height)
+class Triangle(Draw):
+    """Create triangle with 3 point and color.
 
+    Args:
+        point_A (tuple(int)): Cartesian point(x,y)
+        point_B (tuple(int)): Cartesian point(x,y)
+        point_C (tuple(int)): Cartesian point(x,y)
+        color (str): fille color
+    """
 
-class Draw:
-    """Draw some figures."""
-
-    def __init__(self, width: int, height: int):
-        """Create canvas
-
-        Args:
-            width (int): width canvas
-            height (int): height canvas
-        """
-        self.im = Image.new("RGB", (width, height))
-        self.draw = ImageDraw.Draw(self.im)
-
-    def create_triangle(
+    def __init__(
         self,
-        point_A: tuple,
-        point_B: tuple,
-        point_C: tuple,
-        color: str = "red",
+        canvas: Canvas,
+        color: str,
+        point_a: tuple,
+        point_b: tuple,
+        point_c: tuple,
     ):
-        """Create triangle with 3 point and color.
+        self.canvas: Canvas = canvas
+        self.color: str = color
+        self.point_a: tuple = point_a
+        self.point_b: tuple = point_b
+        self.point_c: tuple = point_c
 
-        Args:
-            point_A (tuple(int)): Cartesian point(x,y)
-            point_B (tuple(int)): Cartesian point(x,y)
-            point_C (tuple(int)): Cartesian point(x,y)
-            color (str): fille color
-        """
-        self.draw.polygon(xy=[point_A, point_B, point_C], fill=color)
+    def draw(self):
+        """Draw triangle."""
+        self.canvas.draw.polygon(
+            xy=[self.point_a, self.point_b, self.point_c],
+            fill=self.color,
+        )
 
-    def create_rectangle(
-        self, start_point: tuple, size: tuple, color: str = "red"
+
+class Rectangle(Draw):
+    """Create rectangle with 1 point, size and color.
+
+    Args:
+        start_point (tuple(int)): Cartesian point(x,y)
+        size (tuple(int)): width x height
+        color (str): color
+    """
+
+    def __init__(
+        self,
+        canvas: Canvas,
+        color: str,
+        start_point: tuple,
+        size: tuple,
     ):
-        """Create rectangle with 1 point, size and color.
+        self.canvas: Canvas = canvas
+        self.color: str = color
+        self.start_point: tuple = start_point
+        self.size: tuple = size
 
-        Args:
-            start_point (tuple(int)): Cartesian point(x,y)
-            size (tuple(int)): width x height
-            color (str): color
-        """
-        self.draw.rectangle(xy=[start_point, size], fill=color)
+    def draw(self):
+        """Draw rectangle."""
+        self.canvas.draw.rectangle(
+            xy=[self.start_point, self.size],
+            fill=self.color,
+        )
 
 
 def main():
     """Core Script."""
     file = Read("plik.txt")
-    # file.read_file("plik.txt")
 
-    width = int(file.properties_to_draw["canvas"][0])
-    height = int(file.properties_to_draw["canvas"][1])
+    width_canvas = int(file.properties_to_draw["canvas"][0])
+    height_canvas = int(file.properties_to_draw["canvas"][1])
 
-    im = Draw(width, height)  # draw canvas
-
+    # Triangle
     triangle_point_A = (
         int(file.properties_to_draw["triangle"][1]),
         int(file.properties_to_draw["triangle"][2]),
@@ -146,10 +158,8 @@ def main():
         int(file.properties_to_draw["triangle"][6]),
     )
     triangle_color = file.properties_to_draw["triangle"][0]
-    im.create_triangle(  # draw triangle
-        triangle_point_A, triangle_point_B, triangle_point_C, triangle_color
-    )
 
+    # Rectangle
     rectangle_start_point = (
         int(file.properties_to_draw["rectangle"][1]),
         int(file.properties_to_draw["rectangle"][2]),
@@ -162,11 +172,30 @@ def main():
     )
     rectangle_color = file.properties_to_draw["rectangle"][0]
 
-    im.create_rectangle(
-        rectangle_start_point, rectangle_size, rectangle_color
-    )  # draw rectangle
+    # Create objects
+    canvas = Canvas(width=width_canvas, height=height_canvas)
 
-    im.im.save("pillow_imagedraw.png")  # save file to png
+    triangle = Triangle(
+        canvas=canvas,
+        color=triangle_color,
+        point_a=triangle_point_A,
+        point_b=triangle_point_B,
+        point_c=triangle_point_C,
+    )
+
+    rectangle = Rectangle(
+        canvas=canvas,
+        color=rectangle_color,
+        start_point=rectangle_start_point,
+        size=rectangle_size,
+    )
+
+    # Drawing objects
+    triangle.draw()
+    rectangle.draw()
+
+    # Save image
+    canvas.image.save("image.png")
 
 
 if __name__ == "__main__":
