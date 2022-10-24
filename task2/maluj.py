@@ -144,56 +144,74 @@ class Rectangle(Draw):
         )
 
 
+def read_canvas(file):
+    """Read canvas from file.
+
+    Args:
+        file (file): file with some text to draw.
+
+    Returns:
+        canvas (list): canvas list with width and height.
+    """
+
+    return [int(size) for size in file.properties_to_draw["canvas"]]
+
+
+def read_triangle(file):
+    """Read triangle elements from file.
+
+    Args:
+        file (file): file with some text to draw.
+
+    Returns:
+        triangle_elements (list): Triangle elements from file.
+    """
+    return [element for element in file.properties_to_draw["triangle"]]
+
+
+def read_rectangle(file):
+    """Read rectangle elements from file.
+
+    Args:
+        file (file): file with some text to draw.
+
+    Returns:
+        rectangle_elements (list): Rectangle elements from file.
+    """
+    return [element for element in file.properties_to_draw["rectangle"]]
+
+
 def draw_all_form_file(file):
 
     try:
-        width_canvas = int(file.properties_to_draw["canvas"][0])
-        height_canvas = int(file.properties_to_draw["canvas"][1])
-    except:
-        pass
+        # Canvas
+        canvas_size = read_canvas(file)
+        width_canvas = canvas_size[0]
+        height_canvas = canvas_size[1]
 
-    try:
-        # Triangle
-        triangle_point_A = (
-            int(file.properties_to_draw["triangle"][1]),
-            int(file.properties_to_draw["triangle"][2]),
-        )
-        triangle_point_B = (
-            int(file.properties_to_draw["triangle"][3]),
-            int(file.properties_to_draw["triangle"][4]),
-        )
-
-        triangle_point_C = (
-            int(file.properties_to_draw["triangle"][5]),
-            int(file.properties_to_draw["triangle"][6]),
-        )
-        triangle_color = file.properties_to_draw["triangle"][0]
-    except:
-        pass
-
-    try:
-        # Rectangle
-        rectangle_start_point = (
-            int(file.properties_to_draw["rectangle"][1]),
-            int(file.properties_to_draw["rectangle"][2]),
-        )
-        rectangle_size = (
-            int(file.properties_to_draw["rectangle"][1])
-            + int(file.properties_to_draw["rectangle"][3]),
-            int(file.properties_to_draw["rectangle"][2])
-            + int(file.properties_to_draw["rectangle"][4]),
-        )
-        rectangle_color = file.properties_to_draw["rectangle"][0]
-    except:
-        pass
-
-    try:
         # Create object
         canvas = Canvas(width=width_canvas, height=height_canvas)
     except:
-        pass
+        print(
+            "Your file don't have CANVAS or canvas has more/less parameters than 2."
+        )
 
     try:
+        # Triangle
+        triangle_elements = read_triangle(file)
+        triangle_color = triangle_elements[0]
+        triangle_point_A = (
+            int(triangle_elements[1]),
+            int(triangle_elements[2]),
+        )
+        triangle_point_B = (
+            int(triangle_elements[3]),
+            int(triangle_elements[4]),
+        )
+        triangle_point_C = (
+            int(triangle_elements[5]),
+            int(triangle_elements[6]),
+        )
         # Create object
         triangle = Triangle(
             canvas=canvas,
@@ -202,12 +220,26 @@ def draw_all_form_file(file):
             point_b=triangle_point_B,
             point_c=triangle_point_C,
         )
-        # Drawing objects
+        # Drawing object
         triangle.draw()
     except:
-        pass
+        print(
+            """Your file have incorrect amount of triangle points.
+              You must enter color and 3 points"""
+        )
 
     try:
+        rectangle_elements = read_rectangle(file)
+        # Rectangle
+        rectangle_color = rectangle_elements[0]
+        rectangle_start_point = (
+            int(rectangle_elements[1]),
+            int(rectangle_elements[2]),
+        )
+        rectangle_size = (
+            int(rectangle_elements[1]) + int(rectangle_elements[3]),
+            int(rectangle_elements[2]) + int(rectangle_elements[4]),
+        )
         # Create object
         rectangle = Rectangle(
             canvas=canvas,
@@ -215,16 +247,19 @@ def draw_all_form_file(file):
             start_point=rectangle_start_point,
             size=rectangle_size,
         )
-        # Drawing objects
+        # Drawing object
         rectangle.draw()
     except:
-        pass
+        print(
+            """Your file have incorrect amount of rectangle points.
+              You must enter color, 1 point and size."""
+        )
 
     try:
         # Save image
         canvas.image.save(str(file).split(".")[0] + ".png")
     except:
-        pass
+        print("Your file cannot be saved")
 
 
 def main():
