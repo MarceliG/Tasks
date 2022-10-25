@@ -1,0 +1,2 @@
+canvas 200 400
+rectangle red (15, 20), (154, 327)
