@@ -75,11 +75,12 @@ def check_direction_translate(striped_meta: list):
         # Polish to English
         words_list.append("PL>EN")
     else:
-        return "We don't have this word in our dictionary"
+        print("We don't have this word in our dictionary")
 
-    for i in striped_meta[16:-1]:
-        if i not in words_list:  # I want unique words
-            words_list.append(i)
+    if len(words_list) == 1:
+        for word in striped_meta[16:-1]:
+            if word not in words_list:  # I want unique words
+                words_list.append(word)
     return words_list
 
 
@@ -95,7 +96,7 @@ def compare_all_translated_word_to_str(translated_words: list):
     result_as_string = ""
     for word in translated_words:
         result_as_string += word + " "
-        
+
     return result_as_string
 
 
