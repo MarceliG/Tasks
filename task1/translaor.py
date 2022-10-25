@@ -75,7 +75,9 @@ def check_direction_translate(striped_meta: list):
         # Polish to English
         words_list.append("PL>EN")
     else:
-        print("We don't have this word in our dictionary")
+        print(
+            "We don't have this word in our dictionary or you enter input more than 1 words."
+        )
 
     if len(words_list) == 1:
         for word in striped_meta[16:-1]:
@@ -109,13 +111,20 @@ def translate(input_words: list) -> str:
     print(result)
 
 
-def main(argument: Optional[Sequence[str]] = None):
-    parser = argparse.ArgumentParser(description="tranlate any word")
+def main():
+    parser = argparse.ArgumentParser(
+        description="Tranlate any word from English to Polish or vice versa."
+    )
     parser.add_argument(
-        "word", type=str, nargs="+", help="Enter a word to translate"
+        "-w",
+        "--word",
+        type=str,
+        nargs="+",
+        help="Enter a word to translate",
     )
     args = parser.parse_args()
-    translate(args.word)
+    if args.word:
+        translate(args.word)
     return 0
 
 
